@@ -1,3 +1,36 @@
+# How project was done
+
+- Project was done using KMP.
+- It's using Koin as dependency injection.
+- It's using SKIE to wrap the ViewModel for IOS.
+- It's using Navigation to navigate between screens
+- It's using a Serialization plugin to handle data classes (especially data coming from an API in the future).
+- It's Coroutines to handle asyncronous work.
+- A MVVM pattern was my architectural choice.
+- 
+
+# Future impovements
+- Consume the data from an API by using Ktor.
+- Create a loadind state for both Android and IOS, so we could change the unit tests to handle this states.
+- With the API created we could test the Repository as well.
+- Handle cache data for images or even use the Database to prevent calling API network multiple times
+  
+# Here's a video showing the app running on a physical Samsung s20 FE
+![Screenshot_20250517_211806_KMP Take Home Assignment](https://github.com/user-attachments/assets/c4af6326-dcf1-47a0-a102-28a3eac56afb)
+![Screenshot_20250517_211815_KMP Take Home Assignment](https://github.com/user-attachments/assets/0231b798-0d76-4916-9d6a-f3e218fa4841)
+![Screenshot_20250517_211823_Maps](https://github.com/user-attachments/assets/3d69da4c-bfff-469a-85f9-d0e3af7edfa3)
+![Screenshot_20250517_211831_Chrome](https://github.com/user-attachments/assets/30ea6f49-ab57-45b5-bd88-ac662cf4e5de)
+
+# Here's a video showing the app running on a physical iPhone 15 pro max
+![IMG_0521](https://github.com/user-attachments/assets/3cff0a24-cb61-42de-aacc-ecaa809ecaa2)
+![IMG_0522](https://github.com/user-attachments/assets/04341129-e151-4476-b6fa-fa2a525457b2)
+![IMG_0523](https://github.com/user-attachments/assets/092d93a4-e311-4644-b222-464d6a0fda80)
+![IMG_0524](https://github.com/user-attachments/assets/9674c792-3894-40d9-9d9e-cf378ae9ae58)
+
+
+
+
+
 # Bimm KMP Take Home Assignment - Base repo
 
 IMPORTANT: Don't create a PR to this repo with your solution.
