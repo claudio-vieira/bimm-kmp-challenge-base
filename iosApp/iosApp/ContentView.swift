@@ -2,27 +2,25 @@ import SwiftUI
 import Shared
 
 struct ContentView: View {
-    @State private var showContent = false
+    
+    @State private var path = NavigationPath()
+    
     var body: some View {
-        VStack {
-            Button("Click me!") {
-                withAnimation {
-                    showContent = !showContent
+        NavigationStack(path: $path) {
+            //sakesScreen
+            SakesScreen(viewModel: .init(), onSakeSelected: {
+                selectedSakeLocation in
+                path.append(selectedSakeLocation)
+            })
+                .navigationDestination(for: SakeLocation.self) { sake in
+                    SakeDetailsScreen(sakeLocation: sake)
                 }
-            }
+                .toolbar {
+                    ToolbarItemGroup {
 
-            if showContent {
-                VStack(spacing: 16) {
-                    Image(systemName: "swift")
-                        .font(.system(size: 200))
-                        .foregroundColor(.accentColor)
-                    Text("SwiftUI: \(Greeting().greet())")
+                    }
                 }
-                .transition(.move(edge: .top).combined(with: .opacity))
-            }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .padding()
     }
 }
 
