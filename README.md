@@ -7,10 +7,10 @@
 - It's using a Serialization plugin to handle data classes.
 - It's using Coroutines to handle asyncronous work.
 - A MVVM pattern was the architectural choice.
-- 
 
 # Future impovements
 - Handle cache data for images or even use the Database to prevent calling API network multiple times
+- Create Ui tests with espresso
   
 # Here are some images of the app running on a physical device Samsung s20 FE
 <img src="https://github.com/user-attachments/assets/c4af6326-dcf1-47a0-a102-28a3eac56afb" width="240" height="532" />
@@ -24,7 +24,9 @@
 <img src="https://github.com/user-attachments/assets/092d93a4-e311-4644-b222-464d6a0fda80" width="240" height="532" />
 <img src="https://github.com/user-attachments/assets/9674c792-3894-40d9-9d9e-cf378ae9ae58" width="240" height="532" />
 
-# Project is using the desinger Mock.io(https://designer.mocky.io) to fake the information instead of using json
+# Project is using the desinger Mocky.io(https://designer.mocky.io) to fake the information instead of using json
+# WARNING!!
+The Mocky.io can remove the data. In this case, create a new API mock following their documentation and change the url on Variables object on Utils.kt
 
 # What you need
 
