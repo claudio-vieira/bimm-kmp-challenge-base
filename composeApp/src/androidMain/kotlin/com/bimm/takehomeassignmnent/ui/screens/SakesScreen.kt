@@ -15,26 +15,33 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bimm.takehomeassignmnent.extentions.formattedRating
 import com.bimm.takehomeassignmnent.presentation.SakeLocationsSharedViewModel
 import com.bimm.takehomeassignmnent.sakes.data.SakeLocation
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SakesScreen(
     onGotoSakeDetailsClick: () -> Unit,
-    sakeLocationsSharedViewModel: SakeLocationsSharedViewModel = koinViewModel(),
+    sakeLocationsSharedViewModel: SakeLocationsSharedViewModel,
 ) {
+    val sakeLocationState = sakeLocationsSharedViewModel.sakeLocationState.collectAsState()
+
     Column {
         AppBar()
-        SakeListView(sakeLocationsSharedViewModel, onGotoSakeDetailsClick)
+
+        if (sakeLocationState.value.error != null)
+            ErrorMessage(sakeLocationState.value.error!!)
+        if (sakeLocationState.value.sakeLocations.isNotEmpty())
+            SakeListView(sakeLocationsSharedViewModel, onGotoSakeDetailsClick)
     }
 }
 
@@ -53,10 +60,11 @@ private fun SakeListView(
 ) {
     Box {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(viewModel.sakeLocationState.value) { sakeLocation ->
+            items(viewModel.sakeLocationState.value.sakeLocations) { sakeLocation ->
                 SakeItemView(
                     sakeLocation = sakeLocation,
-                    onGotoSakeDetailsClick = onGotoSakeDetailsClick
+                    onGotoSakeDetailsClick = onGotoSakeDetailsClick,
+                    sakeLocationsSharedViewModel = viewModel
                 )
             }
         }
@@ -66,7 +74,7 @@ private fun SakeListView(
 @Composable
 private fun SakeItemView(
     sakeLocation: SakeLocation,
-    sakeLocationsSharedViewModel: SakeLocationsSharedViewModel = koinViewModel(),
+    sakeLocationsSharedViewModel: SakeLocationsSharedViewModel,
     onGotoSakeDetailsClick: () -> Unit
 ) {
 
@@ -99,5 +107,18 @@ private fun SakeItemView(
             )
             Spacer(modifier = Modifier.height(4.dp))
         }
+    }
+}
+
+@Composable
+private fun ErrorMessage(message: String) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = message,
+            style = TextStyle(fontSize = 28.sp, textAlign = TextAlign.Center)
+        )
     }
 }

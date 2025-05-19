@@ -13,7 +13,7 @@ extension SakesScreen {
             sakeLocationsState = sakeLocationsSharedViewModel.sakeLocationState.value
         }
         
-        @Published var sakeLocationsState: [SakeLocation]
+        @Published var sakeLocationsState: SakeLocationState
         
         func startObserving() {
             Task {
@@ -34,10 +34,18 @@ struct SakesScreen: View {
         VStack {
             AppBar()
             
-            if(!viewModel.sakeLocationsState.isEmpty) {
+            if viewModel.sakeLocationsState.loading {
+                Loader()
+            }
+            
+            if let error = viewModel.sakeLocationsState.error {
+                ErrorMessage(message: error)
+            }
+            
+            if(!viewModel.sakeLocationsState.sakeLocations.isEmpty) {
                 ScrollView {
                     LazyVStack(spacing: 10) {
-                        ForEach(viewModel.sakeLocationsState, id: \.self) { sakeLocation in
+                        ForEach(viewModel.sakeLocationsState.sakeLocations, id: \.self) { sakeLocation in
                             SakeItemView(sakeLocation: sakeLocation) {
                                 onSakeSelected(sakeLocation)
                             }
@@ -78,6 +86,21 @@ struct SakeItemView: View {
         .onTapGesture {
             onTap()
         }
+    }
+}
+
+struct Loader: View {
+    var body: some View {
+        ProgressView()
+    }
+}
+
+struct ErrorMessage: View {
+    var message: String
+    
+    var body: some View {
+        Text(message)
+            .font(.title)
     }
 }
 

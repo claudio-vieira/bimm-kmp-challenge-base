@@ -1,18 +1,24 @@
 package com.bimm.takehomeassignmnent
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
 import com.bimm.takehomeassignmnent.presentation.SakeLocationsSharedViewModel
+import com.bimm.takehomeassignmnent.sakes.data.ISakeRepository
 import com.bimm.takehomeassignmnent.sakes.data.SakeLocation
-import com.bimm.takehomeassignmnent.sakes.data.SakeRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+
+class FakeSakeRepository(private val result: ResponseState<List<SakeLocation>>) : ISakeRepository {
+    override suspend fun fetchSakeLocations(): ResponseState<List<SakeLocation>> = result
+}
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SakeLocationsSharedViewModelTest {
@@ -30,9 +36,9 @@ class SakeLocationsSharedViewModelTest {
     }
 
     @Test
-    fun testSakeLocationStateIsLoadedCorrectly() = runTest {
+    fun `fetch success updates state with data`() = runTest {
         // Given
-        val fakeData = listOf(
+        val sakeList = listOf(
             SakeLocation(
                 name = "信州スシサカバ 寿しなの",
                 description = "Sushi bar with a variety of sake options.",
@@ -45,43 +51,40 @@ class SakeLocationsSharedViewModelTest {
             )
         )
 
-        val fakeDataSource = FakeSakeDataSource(fakeData)
-        val repository = SakeRepository(fakeDataSource)
-
         //When
-        val viewModel = SakeLocationsSharedViewModel(repository)
+        val fakeRepo = FakeSakeRepository(ResponseState.Success(sakeList))
+        val viewModel = SakeLocationsSharedViewModel(fakeRepo)
 
-        // Let the coroutine launch inside ViewModel init complete
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
+
+        val state = viewModel.sakeLocationState.value
 
         // Then
-        assertEquals(fakeData, viewModel.sakeLocationState.value)
+        assertEquals(sakeList, state.sakeLocations)
+        assertFalse(state.loading)
     }
 
     @Test
-    fun testSetSakeSelected() {
+    fun `setSakeSelected updates selected sake`() {
         // Given
-        val fakeData = listOf(
-            SakeLocation(
-                name = "信州スシサカバ 寿しなの",
-                description = "Sushi bar with a variety of sake options.",
-                picture = "http://ts1.mm.bing.net/th?id=OIP.GURnZicaENMLYBMZN9k1LwHaFS&pid=15.1",
-                rating = 4.0f,
-                address = "〒380-0824 長野県長野市南長野南石堂町1421",
-                coordinates = arrayListOf(36.644257, 138.18668),
-                googleMapsLink = "https://maps.app.goo.gl/4fYMDSfNd6ocsDwt6",
-                website = "https://www.sushinano.com/"
-            )
+        val sake = SakeLocation(
+            name = "信州スシサカバ 寿しなの",
+            description = "Sushi bar with a variety of sake options.",
+            picture = "http://ts1.mm.bing.net/th?id=OIP.GURnZicaENMLYBMZN9k1LwHaFS&pid=15.1",
+            rating = 4.0f,
+            address = "〒380-0824 長野県長野市南長野南石堂町1421",
+            coordinates = arrayListOf(36.644257, 138.18668),
+            googleMapsLink = "https://maps.app.goo.gl/4fYMDSfNd6ocsDwt6",
+            website = "https://www.sushinano.com/"
         )
 
-        val fakeDataSource = FakeSakeDataSource(fakeData)
-        val repository = SakeRepository(fakeDataSource)
+        val fakeRepo = FakeSakeRepository(ResponseState.Success(emptyList()))
+        val viewModel = SakeLocationsSharedViewModel(fakeRepo)
 
-        val viewModel = SakeLocationsSharedViewModel(repository)
-        val selected = fakeData[0]
+        //When
+        viewModel.setSakeSelected(sake)
 
-        viewModel.setSakeSelected(selected)
-
-        assertEquals(selected, viewModel.sakeSelected)
+        // Then
+        assertEquals(sake, viewModel.sakeSelected)
     }
 }

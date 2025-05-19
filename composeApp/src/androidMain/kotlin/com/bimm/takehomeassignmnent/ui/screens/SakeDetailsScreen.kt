@@ -47,16 +47,16 @@ import com.bimm.takehomeassignmnent.extentions.formattedRating
 import com.bimm.takehomeassignmnent.extentions.isValidImageUrl
 import com.bimm.takehomeassignmnent.presentation.SakeLocationsSharedViewModel
 import com.bimm.takehomeassignmnent.sakes.data.SakeLocation
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SakeDetailsScreen(
+    sakeLocationsSharedViewModel: SakeLocationsSharedViewModel,
     onUpButtonClick: () -> Unit
 ) {
 
     Column {
         AppBar(onUpButtonClick)
-        SakeLocationItemView()
+        SakeLocationItemView(sakeLocationsSharedViewModel)
     }
 }
 
@@ -80,7 +80,7 @@ private fun AppBar(
 
 @Composable
 private fun SakeLocationItemView(
-    sakeLocationsSharedViewModel: SakeLocationsSharedViewModel = koinViewModel()
+    sakeLocationsSharedViewModel: SakeLocationsSharedViewModel
 ) {
     val sakeSelected = sakeLocationsSharedViewModel.sakeSelected
     val context = LocalContext.current
@@ -92,10 +92,12 @@ private fun SakeLocationItemView(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Text(
-                text = sakeSelected.name,
-                style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 22.sp)
-            )
+            sakeSelected?.name?.let {
+                Text(
+                    text = it,
+                    style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 22.sp)
+                )
+            }
             Spacer(modifier = Modifier.height(8.dp))
             Box(
                 modifier = Modifier
@@ -104,40 +106,44 @@ private fun SakeLocationItemView(
                     .padding(8.dp),
                 contentAlignment = Alignment.Center
             ) {
-                ImageItem(sakeSelected)
+                sakeSelected?.let { ImageItem(it) }
             }
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = sakeSelected.description)
+            sakeSelected?.description?.let { Text(text = it) }
             Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = sakeSelected.formattedRating(),
-                style = TextStyle(color = Color.Gray),
-                modifier = Modifier.align(Alignment.End)
-            )
+            sakeSelected?.formattedRating()?.let {
+                Text(
+                    text = it,
+                    style = TextStyle(color = Color.Gray),
+                    modifier = Modifier.align(Alignment.End)
+                )
+            }
             Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = buildAnnotatedString {
-                    withStyle(
-                        style = SpanStyle(
-                            color = Color.Green,
-                            textDecoration = TextDecoration.Underline
+            sakeSelected?.let {
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(
+                            style = SpanStyle(
+                                color = Color.Green,
+                                textDecoration = TextDecoration.Underline
+                            )
+                        ) {
+                            append(it.address)
+                        }
+                    },
+                    modifier = Modifier.clickable {
+                        openGoogleMapsAtCoordinates(
+                            context,
+                            it.coordinates[0],
+                            it.coordinates[1]
                         )
-                    ) {
-                        append(sakeSelected.address)
                     }
-                },
-                modifier = Modifier.clickable {
-                    openGoogleMapsAtCoordinates(
-                        context,
-                        sakeSelected.coordinates[0],
-                        sakeSelected.coordinates[1]
-                    )
-                }
-            )
+                )
+            }
             Spacer(modifier = Modifier.height(4.dp))
             Button(
                 modifier = Modifier.align(Alignment.End),
-                onClick = { uriHandler.openUri(sakeSelected.website) }
+                onClick = { sakeSelected?.website?.let { uriHandler.openUri(it) } }
             ) {
                 Text(
                     text = "Visit Website"
